@@ -178,11 +178,11 @@ class Validation_Report(Report):
     def trend_chart(self, ws: object, length: int): # trend 데이터를 그린다.
         chart = LineChart()
         if self.div == "Validation":
-            P_datas = Reference(ws, min_col=4, min_row=34, max_row=35 + length)
+            P_datas = Reference(ws, min_col=4, min_row=35, max_row=35 + length)
             chart.title = "Validation TREND"
             chart.width = 18
         elif self.div == "Trend":
-            P_datas = Reference(ws, min_col=4, min_row=34, max_row=35 + length)
+            P_datas = Reference(ws, min_col=4, min_row=35, max_row=35 + length)
             chart.title = "Process TREND"
             chart.width = 17
         chart.add_data(P_datas)

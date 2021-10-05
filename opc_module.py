@@ -12,6 +12,9 @@ from lims_module import *
 from modbus_module import *
 from LIMS_auto_module import *
 from db_module import *
+from VO.lims import LIMS
+from VO.report import report
+from VO.device import device
 
 global alarm_init, in_valid_init, maint_init
 global ana_fault_init, lims_btn_init, lims_db_init, valid_permit_init
@@ -239,8 +242,12 @@ class withOPC:
             self.dbmodule.insertExceptLogByTag(self.object_tag, "calibration")
             return "ERROR"
 
-    def lims_Comparison(self, process_tag, start_dt, end_dt, lims_value):
-        lm = lims_module(self.object_tag, process_tag, start_dt, end_dt, lims_value)
+    def lims_Comparison(self, lims_data):
+        lm = lims_module(self.object_tag,
+                         lims_data.get_process_tag(),
+                         lims_data.get_start_datetime(),
+                         lims_data.get_end_datetime(),
+                         lims_data.get_lims_value())
         result = lm.compare_process_value()
         return result
 

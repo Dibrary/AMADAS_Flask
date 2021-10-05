@@ -49,6 +49,7 @@ def controller_selector(network, taggs, ana_tag, user_id=None): # network 정보
 
 def report_selector(report_data): # report_type에 따라 다른 인스턴스의 메서드로 연결해 준다.
     result = ""
+    report_type = report_data.get_report_type()
     if report_type == "Validation":
         rc = ReportController(report_data)
         result = rc.validation_report()
@@ -201,10 +202,13 @@ def lims_compare(ana_tag, process_tag, start_dt, end_dt, lims_value): # lims 결
             end_dt[0:4] + "-" + end_dt[4:6] + "-" + end_dt[6:8] + " " +
             end_dt[8:10] + ":" + end_dt[10:12] + ":" + end_dt[12:14]
     )
+
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
     controller = controller_selector(network, taggs, ana_tag)
-    result = controller.lims_comparison(process_tag, start_datetime, end_datetime, lims_value)
+    lims_data = LIMS(process_tag=process_tag, start_datetime=start_datetime,
+                     end_datetime=end_datetime,lims_value=lims_value)
+    result = controller.lims_comparison(lims_data)
     print(result, "lims compare result", type(result))
     return str(result)
 
@@ -230,7 +234,7 @@ def make_report(ana_tag, user_id, report_type, start_dt, end_dt, bottle_tag, fil
     )
 
     report_data = report(ana_tag=ana_tag, user_id=user_id,
-                         report_type=report_type, start_datetime= start_dt, end_dateteim=end_dt,
+                         report_type=report_type, start_datetime= start_dt, end_datetime=end_dt,
                          bottle_tag=bottle_tag, file_name=file_name)
     result = report_selector(report_data)
     return result

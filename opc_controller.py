@@ -1,6 +1,8 @@
 
 from opc_module import *
-
+from VO.lims import LIMS
+from VO.device import device
+from VO.report import report
 
 class OpcController: # main파일과 opc_module 파일 사이에 연결 역할.
     def __init__(self, object_tag, taggs, user_id=None):
@@ -77,8 +79,8 @@ class OpcController: # main파일과 opc_module 파일 사이에 연결 역할.
         result = self.opcmodule.calibration(self.user_id)
         return result
 
-    def lims_comparison(self, process_tag, start_dt, end_dt, lims_value):
-        result = self.opcmodule.lims_Comparison(process_tag, start_dt, end_dt, lims_value)
+    def lims_comparison(self, lims_data):
+        result = self.opcmodule.lims_Comparison(lims_data)
         return result
 
     def start_Validation(self, valve_signal, order_type, user_id, bottle_tag):
