@@ -21,10 +21,10 @@ class device:
     def set_network(self, network_value):
         self.__network = network_value
 
-    def get_device(self):
-        return self.__device_tag
+    def get_ana_tag(self):
+        return self.__analyzer_tag
 
-    def get_house(self):
+    def get_house_tag(self):
         return self.__house_tag
 
     def get_taggs(self):

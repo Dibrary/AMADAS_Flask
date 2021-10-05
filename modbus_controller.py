@@ -2,6 +2,10 @@
 from db_module import *
 from modbus_module import *
 
+from VO.device import device
+from VO.lims import LIMS
+from VO.report import report
+
 
 class ModbusController: # main파일과 modbus_module파일 사이에 연결 역할.
     def __init__(self, object_tag, taggs, user_id=None):

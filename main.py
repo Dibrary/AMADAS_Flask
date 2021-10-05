@@ -37,13 +37,13 @@ def selector(ana_tag): # analyzer_tag정보를 토대로, DB에서 SELECT한 후
     db.close()
     return taggs, network
 
-
-def controller_selector(network, taggs, ana_tag, user_id=None): # network 정보에 따라서 Controller객체를 다르게 생성해서 반환한다.
+def controller_selector(device): # network 정보에 따라서 Controller객체를 다르게 생성해서 반환한다.
     result = None
+    network = device.get_network()
     if network[0] == "MODBUS":
-        result = ModbusController(ana_tag, taggs, user_id) # ModbusController 인스턴스 생성하면서 파라미터 전달한다.
+        result = ModbusController(device.get_ana_tag(), device.get_taggs(), device.get_user_id()) # ModbusController 인스턴스 생성하면서 파라미터 전달한다.
     elif network[0] == "OPC":
-        result = OpcController(ana_tag, taggs, user_id) # OpcController 인스턴스 생성하면서 파라미터 전달한다.
+        result = OpcController(device.get_ana_tag(), device.get_taggs(), device.get_user_id()) # OpcController 인스턴스 생성하면서 파라미터 전달한다.
     return result
 
 
@@ -83,8 +83,9 @@ def dashboard_flask(): # 단순히 memory, cpu 가용 상태 확인 할 용도. 
 @app.route("/validation/<ana_tag>/<user_id>/<bottle_tag>")
 def request_validation(ana_tag, user_id, bottle_tag): # validation request 신호를 받아서 해당 Controller로 전달한다.
     taggs, network = selector(ana_tag)
-    if taggs == (): return "CHECK" # analyzer_tag_tb에 데이터가 등록되어있지 않은 경우
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    if taggs == (): return "CHECK"  # analyzer_tag_tb에 데이터가 등록되어있지 않은 경우
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network, bottle_tag=bottle_tag)
+    controller = controller_selector(analyzer)
     result = controller.request_validation(bottle_tag) # 실질적으로 동작하는 인스턴스의 메서드는 request_validation이다.
     return result
 
@@ -93,7 +94,8 @@ def request_validation(ana_tag, user_id, bottle_tag): # validation request 신�
 def semi_auto_validation(ana_tag, user_id):  # semi_auto_validation 도중에, 사용자가 값을 저장하고자 할 때 누르는 버튼 받는 메서드.
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.change_semi_auto_tag() # 실질적으로 동작하는 인스턴스의 메서드는 change_semi_auto_tag다.
     return result # 예외 발생시 NotOK 반환됨.
 
@@ -102,7 +104,8 @@ def semi_auto_validation(ana_tag, user_id):  # semi_auto_validation 도중에, �
 def stop_manual_validation(ana_tag, user_id): # manual_validation을 멈추기 위한 신호를 Controller로 전달하는 메서드다.
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.stop_manual_validation() # 실질적으로 동작하는 인스턴스의 메서드는 stop_manual_validation이다.
     return result
 
@@ -112,7 +115,8 @@ def request_maintenance(ana_tag, user_id): # maintenance request신호를 Contro
     Scheduler_check()
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.request_maintenance() # 실질적으로 동작하는 인스턴스의 메서드는 request_maintenance다.
     return result # 네트워크 도중 에러가 생기면 ERROR가 반환됨.
 
@@ -122,7 +126,8 @@ def start_maintenance(ana_tag, user_id): # start maintenance 신호를 Controlle
     print("start_maintenance")
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.start_maintenance() # 실질적으로 동작하는 인스턴스의 메서드는 start_maintenance다.
     return result # 네트워크 도중 에러가 생기면 ERROR 반환함.
 
@@ -131,7 +136,8 @@ def start_maintenance(ana_tag, user_id): # start maintenance 신호를 Controlle
 def stop_maintenance(ana_tag, user_id): # stop maintenance 신호를 Controller에 전달한다.
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.stop_maintenance() # 실질적으로 동작하는 인스턴스의 메서드는 stop_maintenance다.
     return result # 네트워크 도중 에러가 생기면 ERROR 반환함.
 
@@ -140,7 +146,8 @@ def stop_maintenance(ana_tag, user_id): # stop maintenance 신호를 Controller�
 def calibration(ana_tag, user_id): # calibration신호를 Controller에 전달한다.
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag, user_id)
+    analyzer = device(ana_tag=ana_tag, user_id=user_id, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.calibration() # 실질적으로 동작하는 인스턴스의 메서드는 calibration이다.
     return result # 네트워크 도중 에러가 생기면 ERROR 반환함.
 
@@ -164,7 +171,8 @@ def analyzerstate_for_house(house_tag):  # House 화면 들어갔을 때 analyze
     taggs = db.selectAllAnalyzerTagByHouseIndex(index)
     db.close()
 
-    controller = controller_selector([network], taggs, house_tag)
+    house = device(ana_tag=house_tag, network=[network], taggs=taggs) # 여기서의 house_tag는 house를 구별할 목적 보다는 device의 의미로 사용.
+    controller = controller_selector(house)
     result = controller.analyzer_state_for_house()
     return result # 에러 발생시 6이 반환된다
 
@@ -172,7 +180,8 @@ def analyzerstate_for_house(house_tag):  # House 화면 들어갔을 때 analyze
 def analyzerstate_for_analyzer(ana_tag):  # Analyzer 화면 들어갔을 때 analyzer 상태 나타냄
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag)
+    analyzer = device(ana_tag=ana_tag, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.analyzer_state_for_analyzer()
     return result
 
@@ -180,7 +189,8 @@ def analyzerstate_for_analyzer(ana_tag):  # Analyzer 화면 들어갔을 때 ana
 def check_dcs_permit(ana_tag): # dcs에서 permit신호를 1로 변경 했는지를 확인한다.
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag)
+    analyzer = device(ana_tag=ana_tag, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.check_dcs_permit()
     return result
 
@@ -188,7 +198,8 @@ def check_dcs_permit(ana_tag): # dcs에서 permit신호를 1로 변경 했는지
 def check_dcs_start_validation(ana_tag): # dcs_start_validation신호가 1로 되었는지를 확인한다.
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag)
+    analyzer = device(ana_tag=ana_tag, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
     result = controller.check_dcs_start_validation()
     return result
 
