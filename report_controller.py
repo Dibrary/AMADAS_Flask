@@ -3,7 +3,7 @@ from validation_report import *
 from event_report import *
 from multi_validation_report import *
 from all_kpi_report import *
-
+from VO.report import report
 
 class ReportController: # 각종 report 생성 객체와 연결하는 중간 역할.
     ana_tag: str
@@ -13,13 +13,13 @@ class ReportController: # 각종 report 생성 객체와 연결하는 중간 역
     bottle_tag: str
     file_name: str
 
-    def __init__(self, ana_tag, user_id, start_dt, end_dt, bottle_tag, file_name):
-        self.ana_tag = ana_tag
-        self.user_id = user_id
-        self.start_dt = start_dt
-        self.end_dt = end_dt
-        self.file_name = file_name
-        self.bottle_tag = bottle_tag
+    def __init__(self, report_data):
+        self.ana_tag = report_data.get_device_tag()
+        self.user_id = report_data.get_user_id()
+        self.start_dt = report_data.get_start_datetime()
+        self.end_dt = report_data.get_end_datetime()
+        self.file_name = report_data.get_file_name()
+        self.bottle_tag = report_data.get_bottle_tag()
 
         self.dbmodule = withDB()
 

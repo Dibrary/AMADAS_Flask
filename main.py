@@ -47,22 +47,22 @@ def controller_selector(network, taggs, ana_tag, user_id=None): # network 정보
     return result
 
 
-def report_selector(report_type, ana_tag, user_id, start_datetime, end_datetime, bottle_tag, file_name): # report_type에 따라 다른 인스턴스의 메서드로 연결해 준다.
+def report_selector(report_data): # report_type에 따라 다른 인스턴스의 메서드로 연결해 준다.
     result = ""
     if report_type == "Validation":
-        rc = ReportController(ana_tag, user_id, start_datetime, end_datetime, bottle_tag, file_name)
+        rc = ReportController(report_data)
         result = rc.validation_report()
     elif report_type == "Trend":
-        rc = ReportController(ana_tag, user_id, start_datetime, end_datetime, bottle_tag, file_name)
+        rc = ReportController(report_data)
         result = rc.trend_report()
     elif report_type == "Alarm":
-        rc = ReportController(ana_tag, user_id, start_datetime, end_datetime, bottle_tag, file_name)
+        rc = ReportController(report_data)
         result = rc.alarm_report()
     elif report_type == "Maintenance":
-        rc = ReportController(ana_tag, user_id, start_datetime, end_datetime, bottle_tag, file_name)
+        rc = ReportController(report_data)
         result = rc.maintenance_report()
     elif report_type == "Whole":  # 전체 analyzer의 KPI에 대한 정보를 요약한 report
-        rc = ReportController(ana_tag, user_id, start_datetime, end_datetime, bottle_tag, file_name)
+        rc = ReportController(report_data)
         result = rc.all_kpi_report()
     return result
 
@@ -229,6 +229,9 @@ def make_report(ana_tag, user_id, report_type, start_dt, end_dt, bottle_tag, fil
             end_dt[8:10] + ":" + end_dt[10:12] + ":" + end_dt[12:14]
     )
 
+    report_data = report(ana_tag=ana_tag, user_id=user_id,
+                         report_type=report_type, start_datetime= start_dt, end_dateteim=end_dt,
+                         bottle_tag=bottle_tag, file_name=file_name)
     result = report_selector(report_data)
     return result
 
