@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <address>
-    <version>1</version>
+    <version>2</version>
     <opctag>
          <server>
             <url>opc.tcp://admin@192.168.0.134:4842</url>
@@ -10,7 +10,14 @@
     <modbustag>
          <slave>
             <dcsip>192.168.0.134:504</dcsip>
-            <gcip>192.168.0.134:502</gcip>
+             <gc>
+                 <ip>192.168.0.134:502</ip>
+                 <no>6</no>
+             </gc>
+             <gc>
+                 <ip>192.168.0.134:503</ip>
+                 <no>7</no>
+             </gc>
          </slave>
     </modbustag>
     <dbserver>

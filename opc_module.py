@@ -3,6 +3,7 @@ import time
 
 from abc import *
 from lxml import etree
+from flask_socketio import SocketIO, send, join_room,leave_room, emit, close_room, rooms, disconnect
 
 from validation_opc_module import *
 from validation_modbus_module import *
@@ -46,13 +47,14 @@ class withOPC:
 
         self.dbmodule = withDB()
         if self.version == 2:
-            modbus_taggs = self.dbmodule.selectAnalyzerTag(self.object_tag, "MODBUS")
+            # object_tag로 House가 들어온다...
+            modbus_taggs = self.dbmodule.selectAnalyzerTag(self.object_tag, "MODBUS") # tag 첫 번째에 db의 데이터 no있다.
             if modbus_taggs != None:
                 self.modbus_taggs = modbus_taggs
+                self.index_m = self.modbus_taggs[25]
+                self.modbusmodule = withMODBUS(object_tag, self.modbus_taggs)
             else:
-                self.modbus_taggs = [i for i in range(0, 28)] # 임시로 막아 놓음.
-            self.index_m = self.modbus_taggs[25]
-            self.modbusmodule = withMODBUS(object_tag, self.modbus_taggs)
+                pass
         else:
             pass
 
@@ -89,7 +91,7 @@ class withOPC:
             tag_list = [self.taggs[2], self.taggs[16], self.taggs[7], self.taggs[3], self.taggs[15],
                         self.taggs[6]]  # normal, alarm, valid, maint, fault, break 순서
             for i in range(0, len(tag_list)):
-                value = self.getting(index, tag_list[i])
+                value = self.getting(index, tag_list[i]) # opc에서 값 가져온다.
                 if value == 1: result = i
         elif self.version == 2:
             opc_index = self.taggs[25]
@@ -97,7 +99,8 @@ class withOPC:
             # normal, valid, maint, break 순서
             state_values = []
             for i in range(0, len(tag_list)):
-                state_values.append(int(self.getting(opc_index, tag_list[i])))
+                state_values.append(int(self.getting(opc_index, tag_list[i]))) # opc에서 값 가져온다.
+
             alarm, fault = self.modbusmodule.check_alarm_fault(self.index_m, self.modbus_taggs[16], self.modbus_taggs[15])  # index, alarm, fault 순서
             state_values.insert(1, int(alarm))
             state_values.insert(4, int(fault))
@@ -280,6 +283,7 @@ class withOPC:
                 self.set_to_on(index, start_valid_tag)  # start_validation ON(OPC)
                 time.sleep(0.5)
             #            self.modbusmodule.set_to_off(self.index_m, valve_tag, "GC") # valve OFF
+            self.set_to_off(index, start_valid_tag)
             self.set_to_on(index, valid_state_tag)  # in_validation ON
             print(valid_state_tag)
             print("in_validation ON")

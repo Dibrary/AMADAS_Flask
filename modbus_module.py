@@ -36,12 +36,24 @@ class withMODBUS:
     def __init__(self, object_tag, taggs):
         self.object_tag = object_tag
         self.taggs = taggs
+        self.no = taggs[0]
+
+        self.gcip, self.gcport = None, None
+        gcip_temp, gcport_temp, gcno = [],[],[]
+
         root = (etree.parse("opc_modbus_db_ip.xml")).getroot()
         for i in root.iter("slave"):
             self.dcsip = (i.findtext("dcsip"))[:13]   # dcs ip
             self.dcsport = (i.findtext("dcsip"))[14:] # dcs port
-            self.gcip = (i.findtext("gcip"))[:13]   # gc ip
-            self.gcport = (i.findtext("gcip"))[14:] # gc port
+
+        for k in root.iter("gc"):
+            gcip_temp.append((k.findtext("ip"))[:13])   # gc ip
+            gcport_temp.append((k.findtext("ip"))[14:]) # gc port
+            gcno.append(int(k.findtext("no")))     # gc no
+
+        index = (gcno).index(self.no) # DB의 no랑 같은 no를 찾고,
+        self.gcip, self.gcport = gcip_temp[index], gcport_temp[index] # 해당 index의 ip와 port에 접속하게 한다.
+
         for j in root.iter("address"):  self.version = int(j.findtext("version"))
         self.dbmodule = withDB()
 
@@ -82,6 +94,7 @@ class withMODBUS:
             self.client2.write_coil((int(tag) + int(index)), False)
         self.modbusclose()
 
+    # digital_input_getting 메서드는 혹시 몰라서 만들어 둔 코드.
     def digital_input_getting(self, index, tag, flag): # 1로 시작하는 address에서 상태값을 읽어온다.
         value = 0
         self.modbusconnect()

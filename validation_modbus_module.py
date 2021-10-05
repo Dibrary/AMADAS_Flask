@@ -1,7 +1,7 @@
 import datetime
 import time
 from abc import *
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send, join_room,leave_room, emit, close_room, rooms, disconnect
 from opcua import Client
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
@@ -116,9 +116,11 @@ class Validation_Architecture(metaclass=ABCMeta):
         return value
 
     def geting_validation_value(self, tag): # holding_register에서 값을 읽고, 2칸 씩 (float32)읽는다.
-        value = self.client.read_holding_registers(int(tag)+int(self.index), 2)
-        value.registers[0], value.registers[1] = value.registers[1], value.registers[0] # 자리수 교환
-        result = self.endian_decoder(value)
+        result = (self.client.read_holding_registers(int(tag)+int(self.index), 2)).registers[0] # simulator용
+
+        #value = self.client.read_holding_registers(int(tag)+int(self.index), 2)
+        #value.registers[0], value.registers[1] = value.registers[1], value.registers[0] # 자리수 교환
+        #result = self.endian_decoder(value)
         return result
 
     def single_slop_detector(self): # 단일 노드에서 slop를 계산한다.
@@ -226,19 +228,19 @@ class Auto_Validation(Validation_Architecture):
                         elif self.come_read_recognize() != come_read_init:
                             print("recognized come read signal")
 
-                            valid_value = self.geting_validation_value(self.validation_taggs[0][0])
+                            valid_value = float(self.geting_validation_value(self.validation_taggs[0][0]))
                             validation_value.append(valid_value)
                             validation_time.append(datetime.datetime.now())
 
                             if ((valid_value > self.component[0][4]) or (valid_value < self.component[0][5])):  # upper보다 크거나, lower보다 작으면 fail_no+=1
                                 fail_no = 1
                             print(valid_value, "값")
+
                             to_client = dict()
                             to_client['message'] = valid_value
                             to_client['nodes'] = self.validation_taggs[0][0]
                             to_client['type'] = ana_tag
                             send(to_client, broadcast=True)
-
                             come_read_init = 1
                             cnt += 1
                     elif self.come_read_recognize() == 0:  # 이 조건부는, 무한 반복루프 속에서 계속 저장하는 것을 방지하기 위함.
