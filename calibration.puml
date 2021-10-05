@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+-> calibration: @(ana_tag, user_id)
+calibration -> main.py: selector(ana_tag)
+calibration <- main.py: taggs, network
+calibration -> main.py: controller_selector(network, taggs, ana_tag, user_id)
+calibration <- main.py: controller
+calibration -> controller.py: calibration()
+controller.py -> module.py: calibration(user_id)
+
+module.py -> module.py : set_to_on(index, calib_tag)
+module.py -> module.py : getting(index, calib_tag) -> calib_value
+
+alt version == 1
+    alt calib_value == 0
+        controller.py <- module.py: result = "NotOK"
+    else in_maint_value == 1
+        module.py -> dbmodule.py : insertEventStartLog(object_tag, "CALIB", in_maint_tag, user_id)
+        controller.py <- module.py: result = "OK"
+    end
+else
+    module.py -> modbusmodule.py: calibration(user_id)
+    module.py <- modbusmodule.py :result
+calibration <- controller.py: result
+@enduml

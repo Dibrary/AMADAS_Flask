@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<address>
+    <version>1</version>
+    <opctag>
+         <server>
+            <url>opc.tcp://admin@192.168.0.134:4842</url>
+            <start>2021-01-23 10:00:00</start>
+         </server>
+    </opctag>
+    <modbustag>
+         <slave>
+            <dcsip>192.168.0.134:504</dcsip>
+            <gcip>192.168.0.134:502</gcip>
+         </slave>
+    </modbustag>
+    <dbserver>
+        <ip>localhost</ip>
+        <user>root</user>
+        <port>3306</port>
+        <password>cute1004!</password>
+        <db>testing</db>
+    </dbserver>
+    <limsserver>
+        <ip>localhost</ip>
+        <user>root</user>
+        <port>3306</port>
+        <password>cute1004!</password>
+        <db>testing</db>
+    </limsserver>
+    <report>
+        <path>C:\\Users\\user\\Desktop\\</path>
+    </report>
+</address>

@@ -1,0 +1,127 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+-> start_validation: @(order_type, ana_tag, valve_signal, user_id, bottle_tag)
+
+start_validation -> controller.py: start_Validation(valve_signal, order_type, user_id, bottle_tag)
+controller.py -> modbule.py :start_Validation_preprocess(valve_signal, order_type, object_tag, user_id, bottle_tag)
+
+alt version == 1
+    module.py -> dbmodule.py : selectBottleValve(ana_tag, bottle_tag, "OPC")
+    module.py <- dbmodule.py: valve_tag
+else version == 2
+    module.py -> dbmodule.py : selectBottleValve(ana_tag, bottle_tag, "MODBUS")
+    module.py <- dbmodule.py: valve_tag
+end
+
+module.py -> module.py : check_alarm_fault(index, alarm_tag, fault_tag) -> alarm, fault
+
+alt alarm + fault >0
+    controller.py <- module.py : result = "Alarm"
+else alarm + fault == 0
+    alt valve_signal == "PULSE"
+        module.py -> module.py : check_valve_on_pulse(index, valve_tag)
+
+        alt version == 1
+            module.py -> validation.py : start_Validation(opcclient, order, ana_tag, bottle_tag, user_id)
+            validation.py -> validation.py : create_process(opcclient, valid_type, ana_tag, bottle_tag, user_id)
+            validation.py -> validation.py : select_analyzer_type(ana_tag)
+            alt analyzer_type == "Batch"
+                validation.py -> validation.py : batch_validation(node_type, ana_tag, user_id)
+                loop count
+                    validation.py -> validation.py : Auto_Validation(opcclient, ana_tag, bottle_tag, user_id)
+                    validation.py -> validation.py : geting_value(alarm_tag)
+                    validation.py -> validation.py : geting_value(fault_tag)
+                    validation.py -> validation.py : geting_value(validation_taggs) -> valid_value
+                end
+                validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+                statistical.py -> statistical.py : singl_AD_check()
+                statistical.py -> statistical.py : singl_dixon_test_method()
+                statistical.py -> statistical.py : single_make_random_aim_values(aim, wl, cl) -> aim_values
+                statistical.py -> statistical.py : singl_F_value(aim_values)
+                statistical.py -> statistical.py : singl_result_method(statistic_value, chi2_value, F)
+
+                alt validation_type == "MANUAL"
+                    statistical.py -> dbmodule.py : updateValidationManualData(start_time, result, user_id)
+                else
+                    statistical.py -> dbmodule.py : insertValidationData(ana_tag, validation_tag, validation_type, validation_value, start_time, check_time, result, bottle_tag, user_id)
+                end
+                statistical.py -> validation.py : result
+            else
+                validation.py -> validation.py : continue_validation(node_type, ana_tag, user_id)
+                loop count
+                    validation.py -> validation.py : Auto_Validation(opcclient, ana_tag, bottle_tag, user_id)
+                end
+                validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+                validation.py <- statistical.py : result
+            end
+            module.py <- validation.py : result
+        else version == 2
+            module.py -> modbus_validation.py : start_Validation(client2, order, ana_tag, bottle_tag, user_id)
+            modbus_validation.py -> modbus_validation.py : create_process(client2, valid_type, ana_tag, bottle_tag, user_id)
+            modbus_validation.py -> modbus_validation.py : select_analyzer_type(ana_tag)
+            alt analyzer_type == "Batch"
+                modbus_validation.py -> modbus_validation.py : batch_validation(node_type, ana_tag, user_id)
+                loop count
+                    modbus_validation.py -> modbus_validation.py : Auto_Validation(client, ana_tag, bottle_tag, user_id)
+                end
+                modbus_validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+            else
+                modbus_validation.py -> modbus_validation.py : continue_validation(node_type, ana_tag, user_id)
+                loop count
+                    modbus_validation.py -> modbus_validation.py : Auto_Validation(client2, ana_tag, bottle_tag, user_id)
+                end
+                modbus_validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+            end
+            modbus_validation.py <- statistical.py : result
+            module.py <- modbus_validation.py: result
+        end
+    else valve_signal == "HOLD"
+        module.py -> module.py : check_valve_on_hold(index, valve_tag)
+
+        alt version == 1
+            module.py -> validation.py : start_Validation(opcclient, order, ana_tag, bottle_tag, user_id)
+            validation.py -> validation.py : create_process(opcclient, valid_type, ana_tag, bottle_tag, user_id)
+            validation.py -> validation.py : select_analyzer_type(ana_tag)
+            alt analyzer_type == "Batch"
+                validation.py -> validation.py : batch_validation(node_type, ana_tag, user_id)
+                loop count
+                    validation.py -> validation.py : Auto_Validation(opcclient, ana_tag, bottle_tag, user_id)
+                end
+                validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+            else
+                validation.py -> validation.py : continue_validation(node_type, ana_tag, user_id)
+                loop count
+                    validation.py -> validation.py : Auto_Validation(opcclient, ana_tag, bottle_tag, user_id)
+                end
+                validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+            end
+            validation.py <- statistical.py : result
+            module.py <- validation.py : result
+        else version == 2
+            module.py -> modbus_validation.py : start_Validation(client2, order, ana_tag, bottle_tag, user_id)
+            modbus_validation.py -> modbus_validation.py : create_process(client2, valid_type, ana_tag, bottle_tag, user_id)
+            modbus_validation.py -> modbus_validation.py : select_analyzer_type(ana_tag)
+            alt analyzer_type == "Batch"
+                modbus_validation.py -> modbus_validation.py : batch_validation(node_type, ana_tag, user_id)
+                loop count
+                    modbus_validation.py -> modbus_validation.py : Auto_Validation(client, ana_tag, bottle_tag, user_id)
+                end
+                modbus_validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+            else
+                modbus_validation.py -> modbus_validation.py : continue_validation(node_type, ana_tag, user_id)
+                loop count
+                    modbus_validation.py -> modbus_validation.py : Auto_Validation(client2, ana_tag, bottle_tag, user_id)
+                end
+                modbus_validation.py -> statistical.py: Analysis_of_Variance(ana_tag, validation_node, "AUTO", check_validation_type, start_time, valid_time, component, bottle_tag, user_id)
+            end
+            statistical.py -> modbus_validation.py: result
+            module.py <- modbus_validation.py: result
+        end
+    end
+    controller.py <- module.py : result
+end
+
+start_validation <- controller.py: result
+@enduml
