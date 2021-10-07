@@ -56,6 +56,9 @@ def houseIndexAndNetwork():
 def allAnalyzerTagByHouseIndex():
     return "SELECT t.* FROM analyzer_tb as n, analyzer_tag_tb as t WHERE n.house_index = (%s) AND n.network = t.network AND n.analyzer_tag = t.analyzer_tag"
 
+def inValidTagByIndex():
+    return "SELECT in_validation FROM analyzer_tag_tb WHERE no = (%s)"
+
 def analyzerTypeByTag():
     return "SELECT analyzer_type FROM analyzer_tb WHERE analyzer_tag = (%s)"
 

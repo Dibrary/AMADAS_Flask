@@ -476,10 +476,10 @@ class withOPC:
             alarm_value = self.modbusmodule.getting(self.index_m, self.modbus_taggs[16], "GC")
             fault_value = self.modbusmodule.getting(self.index_m, self.modbus_taggs[15], "GC")
 
-        if valid_value != in_valid_init[self.taggs[1] - 1]:
-            in_valid_init[self.taggs[1] - 1] = valid_value
-            valid_tag_state = ("START" if valid_value == 1 else "STOP")
-            self.Analyzerstate_divider(valid_tag_state, self.taggs[4], self.taggs[3], "VALID", self.taggs[7])
+        # if valid_value != in_valid_init[self.taggs[1] - 1]:
+        #     in_valid_init[self.taggs[1] - 1] = valid_value
+        #     valid_tag_state = ("START" if valid_value == 1 else "STOP")
+        #     self.Analyzerstate_divider(valid_tag_state, self.taggs[4], self.taggs[3], "VALID", self.taggs[7])
 
         if fault_value != ana_fault_init[self.taggs[1] - 1]:
             ana_fault_init[self.taggs[1] - 1] = fault_value

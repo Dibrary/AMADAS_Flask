@@ -356,6 +356,7 @@ class Auto_Validation(Validation_Architecture):
         time_list = self.calculate_time_interval()
 
         while cnt != self.count:
+            print(time_list, "시간리스트")
             if ((self.geting_value(self.alarm_tag) == 1) or (
                     self.geting_value(self.fault_tag) == 1)):  # alarm이나 fault신호가 있는지 확인,
                 alarm_no = 1

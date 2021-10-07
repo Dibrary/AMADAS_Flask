@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <address>
-    <version>2</version>
+    <version>1</version>
     <opctag>
          <server>
             <url>opc.tcp://admin@192.168.0.134:4842</url>

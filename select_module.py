@@ -119,6 +119,13 @@ class select: # DB의 내용을 찾아서 가져오는 것과 관련된 기능�
         values = cursor.fetchall()
         return values
 
+    def in_valid_tag_by_index(self, index):
+        cursor = self.conn.cursor()
+        sql = inValidTagByIndex()
+        cursor.execute(sql, (index[0][0]))
+        values = cursor.fetchall()
+        return values[0][0]
+
     def analyzer_type_by_tag(self, ana_tag):
         cursor = self.conn.cursor()
         sql = analyzerTypeByTag()

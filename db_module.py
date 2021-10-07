@@ -168,11 +168,12 @@ class withDB:
         print(ana_tag, validation_tag, network, "DB들어가는 거")
         index = self.select.validation_tag_index_by_tag(ana_tag, validation_tag, network)
         bottle_index = self.select.bottle_index_by_tag(bottle_tag)
-        print(index, bottle_index, "뭐 나오나.")
+        in_valid_tag = self.select.in_valid_tag_by_index(index)
+        print(index, bottle_index, bottle_index, "뭐 나오나.")
         self.insert = insert(self.conn)
         if user_id == None:
             user_id = "AUTO"
-        self.insert.validation_data(index[0], bottle_index, validation_type, validation_value, start_time, check_time, result, user_id)
+        self.insert.validation_data(index[0], bottle_index, validation_type, in_valid_tag, validation_value, start_time, check_time, result, user_id)
 
     def selectHousetagByAnalyzertag(self, ana_tag):
         self.select = select(self.conn)
