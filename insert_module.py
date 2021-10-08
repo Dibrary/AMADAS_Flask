@@ -24,6 +24,12 @@ class insert:# DB에 내용을 삽입하는 것과 관련된 기능만 모여있
         cursor.execute(sql, (index, event_tag, event_type, now, "START", user_id))
         self.conn.commit()
 
+    def insert_valid_status_log(self, index, in_valid_tag, type, start_dt, status, user_id):
+        cursor = self.conn.cursor()
+        sql = insertEventLog()
+        cursor.execute(sql, (index, in_valid_tag, type, start_dt, status, user_id))
+        self.conn.commit()
+
     def insert_event_stop_log(self, index, object_tag, event_type, event_tag, user_id=None):
         now = datetime.datetime.now()
         cursor = self.conn.cursor()
@@ -35,7 +41,7 @@ class insert:# DB에 내용을 삽입하는 것과 관련된 기능만 모여있
         cursor.execute(sql, (index, event_tag, event_type, now, "STOP", user_id))
         self.conn.commit()
 
-    def save_LIMS_data(self, index, result):
+    def save_LIMS_data(self, index, result): # LIMS 버튼 누르면 이쪽으로 들어와서 저장된다.
         print("SAVE LIMS BUTTON DATA ")
         now = datetime.datetime.now()
         cursor = self.conn.cursor()
@@ -51,15 +57,15 @@ class insert:# DB에 내용을 삽입하는 것과 관련된 기능만 모여있
         cursor.execute(sql, (index[0], bottle_index, index[1], validation_type,
                              validation_value, start_time, check_time, result, user_id))
         ###### validation start - stop log 기록부 ######
-        event_sql = insertEventLog()
-        now = datetime.datetime.now()
-        print(index, in_valid_tag, "VALID", start_time, now, user_id, "출력이나 보자")
-        cursor.execute(event_sql, (index[0], in_valid_tag, "VALID", start_time, "START", user_id))
-        cursor.execute(event_sql, (index[0], in_valid_tag, "VALID", now, "STOP", user_id))
+#        event_sql = insertEventLog()
+#        now = datetime.datetime.now()
+#        print(index, in_valid_tag, "VALID", start_time, now, user_id, "출력이나 보자")
+#        cursor.execute(event_sql, (index[0], in_valid_tag, "VALID", start_time, "START", user_id))
+#        cursor.execute(event_sql, (index[0], in_valid_tag, "VALID", now, "STOP", user_id))
         ###############################################
         self.conn.commit()
 
-    def lims_data(self, ana_tag_index, process_tag_index, process_value, start_dt, end_dt, result):
+    def lims_data(self, ana_tag_index, process_tag_index, process_value, start_dt, end_dt, result): # lims compare 결과 들어가는곳이다.
         cursor = self.conn.cursor()
         sql = insertLimsData()
         cursor.execute(sql, (ana_tag_index, process_tag_index, process_value, start_dt, end_dt, result))

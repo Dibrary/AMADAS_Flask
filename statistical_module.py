@@ -191,6 +191,8 @@ class Analysis_of_Variance:
         for i in range(0, len(self.validation_value)):  # 측정한 값들을 모두 DB에 저장한다.
             db.insertValidationData(self.ana_tag, self.validation_tag, self.validation_type, self.validation_value[i],
                                     self.start_time, self.check_time[i], result[1], self.bottle_tag, self.user_id)
+#        db.insertValidationEventStartLog(self.ana_tag, "VALID", self.start_time, self.validation_type)
+#        db.insertValidationEventStopLog(self.ana_tag, "VALID", self.validation_type) # 이렇게 하면 manual을 제외한 경우 validation event log 처리 가능
         db.close()
 
     def singl_manual_save_data(self, result): # single노드의 경우 manual로 측정한 것 DB에 저장하는 것.
@@ -358,10 +360,8 @@ class Analysis_of_Variance:
 
                     result = self.singl_result_method(statistic_value, chi2_value, F)
 
-                    if self.validation_type != "MANUAL":
-                        self.singl_save_data(result)
-                    elif self.validation_type == "MANUAL":
-                        self.singl_manual_save_data(result)
+                    if self.validation_type != "MANUAL":   self.singl_save_data(result)
+                    elif self.validation_type == "MANUAL": self.singl_manual_save_data(result)
                     return result[0]
         else:
             result = ["NotOK", "AD"]
@@ -389,14 +389,10 @@ class Analysis_of_Variance:
             if self.validation_type != "MANUAL":       self.multi_save_data(static_result, result)
             elif self.validation_type == "MANUAL":     self.multi_manual_save_data(static_result, result)
 
-            if "Chi2" in static_result:
-                return ["NotOK", "Chi2"]
-            elif "T" in static_result:
-                return ["NotOK", "T"]
-            elif "F" in static_result:
-                return ["NotOK", "Chi2"]
-            else:
-                return ["OK", "OK"]
+            if "Chi2" in static_result: return ["NotOK", "Chi2"]
+            elif "T" in static_result:  return ["NotOK", "T"]
+            elif "F" in static_result:  return ["NotOK", "Chi2"]
+            else:                       return ["OK", "OK"]
         else:
             print("data set is not standard")
             return ["NotOK", "AD"]

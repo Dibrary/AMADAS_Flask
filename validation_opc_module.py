@@ -1,13 +1,12 @@
 import datetime
 import time
 from abc import *
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO, send, join_room,leave_room, emit, close_room, rooms, disconnect
 from opcua import Client
 import copy
 
 from statistical_module import *
 from db_module import *
-
 
 class Validation_Divider(metaclass=ABCMeta):
     def start_Validation(self, opcclient, valid_type, ana_tag, bottle_tag=None, user_id=None):
@@ -35,7 +34,6 @@ class Validation(Validation_Divider): # valid_type에 따라 validation 인스�
         elif valid_type == "MANUAL":
             process = Manual_Validation(opcclient, ana_tag, bottle_tag, user_id)
         return process
-
 
 class Validation_Architecture(metaclass=ABCMeta):
     def select_taggs(self, ana_tag): # analyzer_tag로 DB의 taggs를 가져온다.
@@ -169,7 +167,6 @@ class Validation_Architecture(metaclass=ABCMeta):
     @abstractmethod
     def continue_multi_validation(self, ana_tag, user_id):
         pass
-
 
 class Auto_Validation(Validation_Architecture):
     def __init__(self, opcclient, ana_tag, bottle_tag, user_id=None):

@@ -5,14 +5,13 @@ from abc import *
 from lxml import etree
 from flask_socketio import SocketIO, send, join_room,leave_room, emit, close_room, rooms, disconnect
 
-from validation_opc_module import *
-from validation_modbus_module import *
-
 from opcua import Client
 from lims_module import *
 from modbus_module import *
 from LIMS_auto_module import *
 from db_module import *
+from validation_opc_module import *
+
 from VO.lims import LIMS
 from VO.report import report
 from VO.device import device
@@ -317,8 +316,7 @@ class withOPC:
                 time.sleep(0.5)
                 #            self.set_to_off(index, valve_tag) # valve OFF
                 self.set_to_off(index, stop_valid_tag)  # stop validation OFF
-                time.sleep(
-                    delay_time.seconds)  # 벨브 닫고 시간이 어느정도 흐른 뒤에 start_validation이 꺼지고, end_validation 트리거 및 in_validation 신호 꺼짐.
+                time.sleep(delay_time.seconds)  # 벨브 닫고 시간이 어느정도 흐른 뒤에 start_validation이 꺼지고, end_validation 트리거 및 in_validation 신호 꺼짐.
                 self.set_to_off(index, start_valid_tag)  # start_validation OFF
             elif self.version == 2:
                 start_valid_tag_m, stop_valid_tag_m = self.modbus_taggs[8], self.modbus_taggs[9]
@@ -476,10 +474,10 @@ class withOPC:
             alarm_value = self.modbusmodule.getting(self.index_m, self.modbus_taggs[16], "GC")
             fault_value = self.modbusmodule.getting(self.index_m, self.modbus_taggs[15], "GC")
 
-        # if valid_value != in_valid_init[self.taggs[1] - 1]:
-        #     in_valid_init[self.taggs[1] - 1] = valid_value
-        #     valid_tag_state = ("START" if valid_value == 1 else "STOP")
-        #     self.Analyzerstate_divider(valid_tag_state, self.taggs[4], self.taggs[3], "VALID", self.taggs[7])
+        if valid_value != in_valid_init[self.taggs[1] - 1]:
+            in_valid_init[self.taggs[1] - 1] = valid_value
+            valid_tag_state = ("START" if valid_value == 1 else "STOP")
+            self.Analyzerstate_divider(valid_tag_state, self.taggs[4], self.taggs[3], "VALID", self.taggs[7])
 
         if fault_value != ana_fault_init[self.taggs[1] - 1]:
             ana_fault_init[self.taggs[1] - 1] = fault_value

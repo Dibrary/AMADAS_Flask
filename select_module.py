@@ -95,6 +95,17 @@ class select: # DB의 내용을 찾아서 가져오는 것과 관련된 기능�
         values = cursor.fetchall()
         return values
 
+    def tag_no_by_ana_tag(self, ana_tag, network):
+        cursor = self.conn.cursor()
+        sql = analyzerTag()
+        cursor.execute(sql, (ana_tag, network))
+        network_value = cursor.fetchall()
+
+        sql2 = tagNoByAnaTag()
+        cursor.execute(sql2, (ana_tag, network_value[0][26]))
+        tag_no = cursor.fetchall()
+        return tag_no # 반환 형은 ((2,),) 이런 꼴.
+
     def first_schedule(self):
         cursor = self.conn.cursor()
         sql = firstSchedule()

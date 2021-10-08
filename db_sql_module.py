@@ -8,6 +8,9 @@ def houseCount():
 def analyzerNetwork():
     return "SELECT network FROM analyzer_tb WHERE analyzer_tag = (%s)"
 
+def tagNoByAnaTag():
+    return "SELECT no FROM analyzer_tag_tb WHERE analyzer_tag = (%s) and network = (%s)"
+
 def analyzerTag():
     return "SELECT * FROM analyzer_tag_tb WHERE analyzer_tag = (%s) AND network = (%s)"
 

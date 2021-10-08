@@ -62,6 +62,36 @@ class withDB:
         index = self.select.tag_no_by_tag(event_type, object_tag, event_tag)
         self.insert.insert_event_start_log(index[0][0], object_tag, event_type, event_tag, user_id)
 
+##############################################################################################################
+    def insertValidationEventStartLog(self, ana_tag, type, start_time, user_id): # user_id로 들어어오는 것 auto / semiauto는 validation type이 들어온다.
+        self.insert = insert(self.conn)
+        self.select = select(self.conn)
+        network = None
+        if self.version == 1: network = 'OPC'
+        else:                 network = 'MODBUS'
+        ana_tag_index = self.select.tag_no_by_ana_tag(ana_tag, network)
+        in_valid_tag = self.select.in_valid_tag_by_index(ana_tag_index)
+        self.insert.insert_valid_status_log(ana_tag_index, in_valid_tag, type, start_time, "START", user_id)
+
+
+    def insertValidationEventStopLog(self, ana_tag, type, user_id):
+        now = datetime.datetime.now() # 이 함수가 불러지는 그 시간을 적음.
+        self.insert = insert(self.conn)
+        self.select = select(self.conn)
+        network = None
+        if self.version == 1: network = 'OPC'
+        else:                 network = 'MODBUS'
+
+        ana_tag_index = self.select.tag_no_by_ana_tag(ana_tag, network)
+        in_valid_tag = self.select.in_valid_tag_by_index(ana_tag_index)
+        self.insert.insert_valid_status_log(ana_tag_index, in_valid_tag, type, now, "STOP", user_id)
+
+##############################################################################################################
+    # 위 메서드는 manual일 때 못 쓰는 문제가 있다;;
+
+
+
+
     def insertEventStopLog(self, object_tag, event_type, event_tag, user_id=None):
         self.insert = insert(self.conn)
         self.select = select(self.conn)
@@ -169,7 +199,6 @@ class withDB:
         index = self.select.validation_tag_index_by_tag(ana_tag, validation_tag, network)
         bottle_index = self.select.bottle_index_by_tag(bottle_tag)
         in_valid_tag = self.select.in_valid_tag_by_index(index)
-        print(index, bottle_index, bottle_index, "뭐 나오나.")
         self.insert = insert(self.conn)
         if user_id == None:
             user_id = "AUTO"
