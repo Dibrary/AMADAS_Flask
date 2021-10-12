@@ -145,7 +145,7 @@ class withOPC:
             self.dbmodule.insertExceptLogByTag(self.object_tag, "check_dcs_start_validation")
             return "ERROR"
 
-    def vbimrequest_Validation(self, bottle_tag):
+    def request_Validation(self, bottle_tag):
         expire_date = self.dbmodule.selectBottleExpireByTag(self.object_tag, bottle_tag)
         if expire_date[0] > datetime.datetime.now():
             result = None
