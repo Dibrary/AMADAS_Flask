@@ -11,7 +11,7 @@ from modbus_controller import *
 def Scheduler_check(): # scheduler를 확인한다. (스레드로 돌기 때문에, 실시간으로 계속 확인한다)
     db = withDB()
     recent_row = db.selectFirstScheduler()
-    if recent_row == ():
+    if recent_row == None or recent_row == ():
         db.close()
         print("there is no schedule")
         pass

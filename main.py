@@ -217,8 +217,9 @@ def lims_compare(ana_tag, process_tag, start_dt, end_dt, lims_value): # lims 결
 
     taggs, network = selector(ana_tag)
     if taggs == (): return "CHECK"
-    controller = controller_selector(network, taggs, ana_tag)
-    lims_data = LIMS(process_tag=process_tag, start_datetime=start_datetime,
+    analyzer = device(ana_tag=ana_tag, taggs=taggs, network=network)
+    controller = controller_selector(analyzer)
+    lims_data = LIMS(ana_tag = ana_tag, process_tag=process_tag, start_datetime=start_datetime,
                      end_datetime=end_datetime,lims_value=lims_value)
     result = controller.lims_comparison(lims_data)
     print(result, "lims compare result", type(result))
